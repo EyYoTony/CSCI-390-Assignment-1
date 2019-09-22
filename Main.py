@@ -1,6 +1,7 @@
 import nltk
 import re
 import csv
+from nltk.stem import PorterStemmer
 
 # generic functions used within the project
 # takes a sentence and returns a tokenized array
@@ -46,8 +47,11 @@ def rmStopWords(wordArr):
 
 
 def lemmatizeWords(wordArr):
-
-    return wordArr
+    porter = PorterStemmer()
+    newArr = []
+    for word in wordArr:
+        newArr.append(porter.stem(word))
+    return newArr
 
 
 # This is the main function to format one incoming csv object
@@ -55,7 +59,7 @@ def lemmatizeWords(wordArr):
 def formatObj(objArr):
     # uses range(1,4) because there isn't a need to tokenize the ID
     for i in range(1, 4):
-        objArr[i] = tag(rmStopWords(tokenize(rmPunctuation(lowerCase(objArr[i])))))
+        objArr[i] = lemmatizeWords(tag(rmStopWords(tokenize(rmPunctuation(lowerCase(objArr[i]))))))
     return objArr
 
 
@@ -66,4 +70,8 @@ with open('smarthome-userstories-3k.csv') as csvDataFile:
     for row in csvReader:
         stories.append(formatObj(row))
 
-print(*stories[1:10])
+# removes the title row
+del stories[0]
+
+# show output in console
+print(*stories, sep="\n")
